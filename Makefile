@@ -7,3 +7,12 @@ all: all.v
 # into "all.v".
 all.v: $(SV_FILES)
 	CONTENTS=$$(sv2v $^) && echo "$$CONTENTS" > $@
+
+verify: all.v
+	apio verify
+
+build: all.v
+	apio build
+
+upload: all.v
+	apio upload
