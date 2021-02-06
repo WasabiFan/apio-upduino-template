@@ -10,8 +10,8 @@ module rgb_blink (
   output wire led_green  // Green
 );
 
-  wire        int_osc            ;
-  reg  [27:0] frequency_counter_i;
+  logic  int_osc;
+  logic  [27:0] frequency_counter_i;
 
 //----------------------------------------------------------------------------
 //                                                                          --
