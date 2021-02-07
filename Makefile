@@ -1,6 +1,6 @@
 SOURCE_SV_FILES := $(wildcard ./*.sv)
 
-all: all.v
+all: all.v verify lint build
 
 # For some features, such as packages, sv2v requires being able to process all
 # sources at once and output a single Verilog file. So we have it combine them
