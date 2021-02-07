@@ -6,3 +6,6 @@ hardware.json
 hardware.out
 
 all.v
+
+*.vcd
+*.out

@@ -16,3 +16,7 @@ build: all.v
 
 upload: all.v
 	apio upload
+
+clean:
+	apio clean
+	rm all.v
