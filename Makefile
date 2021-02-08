@@ -1,5 +1,9 @@
 SOURCE_SV_FILES := $(wildcard ./*.sv)
 
+YOSYS_ROOT = $(shell dirname $(shell dirname $(shell apio raw "which yosys")))
+IVERILOG_ROOT = $(shell dirname $(shell dirname $(shell apio raw "which iverilog")))
+CELLS_SIM_PATH = $(join $(YOSYS_ROOT),/share/yosys/ice40/cells_sim.v)
+
 all: all.v verify lint build
 
 # For some features, such as packages, sv2v requires being able to process all
@@ -16,7 +20,7 @@ verify: all.v
 # Note: verilator does not work with non-synthesizable language features,
 # so testbenches aren't linted.
 lint:
-	YOSYS_ROOT="$$(dirname $$(dirname $$(apio raw "which yosys")))" && apio raw "verilator --lint-only -v $$YOSYS_ROOT/share/yosys/ice40/cells_sim.v $(SOURCE_SV_FILES)"
+	apio raw "verilator --lint-only -v $(CELLS_SIM_PATH) $(SOURCE_SV_FILES)"
 
 build: all.v
 	apio build
@@ -24,9 +28,19 @@ build: all.v
 upload: all.v
 	apio upload
 
-sim: all.v
-	apio sim
+# Apio only supports one testbench (it adds all *_tb.v files at once); the below
+# is an expansion of their original rules, with support for multiple testbenches.
+%_tb.out: all.v %_tb.v
+	apio raw "iverilog -B \"$(IVERILOG_ROOT)/lib/ivl\" -o $@ -D VCD_OUTPUT=$(basename $@) $(CELLS_SIM_PATH) $^"
+
+%_tb.vcd: %_tb.out
+	apio raw "vvp -M \"$(IVERILOG_ROOT)/lib/ivl\" $<"
+
+# testbenches should be plain Verilog files ending in "_tb.v". For some file
+# "mymodule_tb.v", simulate with "make sim-mymodule".
+sim-%: %_tb.vcd
+	apio raw "gtkwave $< $(patsubst %.vcd, %.gtkw, $<)"
 
 clean:
 	apio clean
-	rm all.v
+	rm -f all.v *_tb.vcd *_tb.out
