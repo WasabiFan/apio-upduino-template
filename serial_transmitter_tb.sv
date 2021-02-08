@@ -7,8 +7,10 @@ module serial_transmitter_tb();
     end
 
     reg clock, reset;
-    wire tx_data_available, tx_ready, serial_tx;
-    wire [7:0] tx_data;
+    wire tx_ready, serial_tx;
+
+    reg tx_data_available;
+    reg [7:0] tx_data;
 
     serial_transmitter u_serial_transmitter (
         .clock                (clock),
@@ -19,9 +21,6 @@ module serial_transmitter_tb();
         .serial_tx            (serial_tx)
     );
 
-    assign tx_data = 8'd65;
-    assign tx_data_available = tx_ready;
-
     initial begin
         clock = 1'b0;
     end
@@ -31,9 +30,20 @@ module serial_transmitter_tb();
     end
 
     initial begin
-        @(posedge clock); reset = 1'b1;
-        @(posedge clock); reset = 1'b0;
-        repeat(1000000) @(posedge clock);
+        tx_data_available <= 1'b0; tx_data = 8'b0;
+
+        @(posedge clock); reset <= 1'b1;
+        @(posedge clock); reset <= 1'b0;
+        @(posedge clock);
+
+        @(posedge clock); tx_data_available <= 1'b0; tx_data = 8'hAB;
+        repeat(4997) @(posedge clock);
+        @(posedge clock); tx_data_available <= 1'b1;
+        @(posedge clock); tx_data_available <= 1'b0;
+        repeat(5000*10-1) @(posedge clock);
+        @(posedge clock); tx_data_available <= 1'b1; tx_data = 8'h00;
+        @(posedge clock); tx_data_available <= 1'b0;
+        repeat(5000*10) @(posedge clock);
 
         $finish;
     end

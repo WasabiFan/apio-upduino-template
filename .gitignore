@@ -9,5 +9,7 @@ all.v
 
 *.vcd
 *.out
+# gtkwave includes absolute paths in gtkw files
+*.gtkw
 
 *_tb.v

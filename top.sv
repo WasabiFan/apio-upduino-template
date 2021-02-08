@@ -6,9 +6,10 @@ module top (
   output wire spi_cs,
   output wire serial_txd
 );
-
+    // Explicitly disable the SPI flash since it shares data lines with UART
     assign spi_cs = 1'b1;
 
+    // Use GPIO pin 2 as reset. Tie to ground for reset. "reset" here is active-high.
     logic reset;
     assign reset = ~gpio_2;
 
@@ -45,7 +46,8 @@ module top (
       .RGBLEDEN(1'b1                                            ),
       .RGB0PWM (frequency_counter_i[25]&frequency_counter_i[24] ),
       .RGB1PWM (frequency_counter_i[25]&~frequency_counter_i[24]),
-      .RGB2PWM (reset),
+      // red LED tied to "reset" to indicate when you're triggering reset
+      .RGB2PWM (reset                                           ),
       .CURREN  (1'b1                                            ),
       .RGB0    (led_green                                       ),
       .RGB1    (led_blue                                        ),

@@ -28,7 +28,7 @@ build: all.v
 upload: all.v
 	apio upload
 
-%_tb.v: isa_types.sv %_tb.sv
+%_tb.v: %_tb.sv
 	CONTENTS=$$(sv2v $^) && echo "$$CONTENTS" > $@
 
 # Apio only supports one testbench (it adds all *_tb.v files at once); the below
@@ -39,8 +39,8 @@ upload: all.v
 %_tb.vcd: %_tb.out
 	apio raw "vvp -M \"$(IVERILOG_ROOT)/lib/ivl\" $<"
 
-# testbenches should be plain Verilog files ending in "_tb.v". For some file
-# "mymodule_tb.v", simulate with "make sim-mymodule".
+# testbenches should be SystemVerilog ending in "_tb.v". For some file
+# "mymodule_tb.sv", simulate with "make sim-mymodule".
 sim-%: %_tb.vcd
 	apio raw "gtkwave $< $(patsubst %.vcd, %.gtkw, $<)"
 
