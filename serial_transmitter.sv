@@ -27,6 +27,9 @@ module serial_transmitter(
     always_ff @(posedge clock) begin
         clock_divider <= (clock_divider == (cycles_per_bit-1)) ? 0 : clock_divider + 1;
 
+        data_shift_buffer <= data_shift_buffer;
+        data_shift_buffer_remaining <= data_shift_buffer_remaining;
+
         if (reset) begin
             data_shift_buffer <= {10{ 1'b1 }};
             data_shift_buffer_remaining <= 0;
@@ -38,13 +41,7 @@ module serial_transmitter(
             if (data_shift_buffer_remaining > 0) begin
                 data_shift_buffer <= { 1'b1, data_shift_buffer[9:1] };
                 data_shift_buffer_remaining <= data_shift_buffer_remaining - 1;
-            end else begin
-                data_shift_buffer <= data_shift_buffer;
-                data_shift_buffer_remaining <= data_shift_buffer_remaining;
             end
-        end else begin
-            data_shift_buffer <= data_shift_buffer;
-            data_shift_buffer_remaining <= data_shift_buffer_remaining;
         end
     end
 endmodule
