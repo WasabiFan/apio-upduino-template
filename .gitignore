@@ -9,3 +9,5 @@ all.v
 
 *.vcd
 *.out
+
+*_tb.v

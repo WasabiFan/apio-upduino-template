@@ -1,4 +1,4 @@
-SOURCE_SV_FILES := $(wildcard ./*.sv)
+SOURCE_SV_FILES := $(filter-out $(wildcard ./*_tb.sv), $(wildcard ./*.sv))
 
 YOSYS_ROOT = $(shell dirname $(shell dirname $(shell apio raw "which yosys")))
 IVERILOG_ROOT = $(shell dirname $(shell dirname $(shell apio raw "which iverilog")))
@@ -28,6 +28,9 @@ build: all.v
 upload: all.v
 	apio upload
 
+%_tb.v: isa_types.sv %_tb.sv
+	CONTENTS=$$(sv2v $^) && echo "$$CONTENTS" > $@
+
 # Apio only supports one testbench (it adds all *_tb.v files at once); the below
 # is an expansion of their original rules, with support for multiple testbenches.
 %_tb.out: all.v %_tb.v
@@ -43,4 +46,4 @@ sim-%: %_tb.vcd
 
 clean:
 	apio clean
-	rm -f all.v *_tb.vcd *_tb.out
+	rm -f all.v *_tb.vcd *_tb.out *_tb.v
