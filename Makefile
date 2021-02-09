@@ -39,7 +39,7 @@ upload: all.v
 %_tb.vcd: %_tb.out
 	apio raw "vvp -M \"$(IVERILOG_ROOT)/lib/ivl\" $<"
 
-# testbenches should be SystemVerilog ending in "_tb.v". For some file
+# testbenches should be SystemVerilog files ending in "_tb.sv". For some file
 # "mymodule_tb.sv", simulate with "make sim-mymodule".
 sim-%: %_tb.vcd
 	apio raw "gtkwave $< $(patsubst %.vcd, %.gtkw, $<)"
