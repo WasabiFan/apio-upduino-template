@@ -11,10 +11,11 @@ module top (
 
     // Use GPIO pin 2 as reset. Tie to ground for reset. "reset" here is active-high.
     logic reset;
-    assign reset = ~gpio_2;
+    always_ff @(posedge int_osc) begin
+        reset <= ~gpio_2;
+    end
 
     logic  int_osc;
-    logic  [27:0] frequency_counter_i;
 
     // Internal oscillator
     /* verilator lint_off PINMISSING */
@@ -56,6 +57,7 @@ module top (
     end
 
     // Counter for LED pattern
+    logic  [27:0] frequency_counter_i;
     always @(posedge int_osc) begin
       frequency_counter_i <= frequency_counter_i + 1'b1;
     end
