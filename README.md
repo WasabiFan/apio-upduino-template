@@ -73,7 +73,7 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 1. Clone this repo (or your fork of it) locally.
 2. `cd` into the directory.
 3. Run `make` and confirm no errors are printed.
-4. Run `make sim-serial_transmitter`. It should open gtkwave with the simulation output from the `serial_transmitter`'s testbench.
+4. Run `make sim-serial_transmitter`. It should open gtkwave with the simulation output from the `serial_transmitter`'s testbench. Try dragging in some signals from the left pane!
 5. Ensure your UPduino is connected and run `make upload`. It should synthesize for and flash the device. You should now see the green and blue LEDs blinking.
 6. Unplug and re-plug the UPduino.
 7. Temporarily make a connection between pin 2 and GND on the UPduino. (Make sure not to short any other pins!) This is the default reset pin I've configured. While this connection is held, the red LED should be on.
