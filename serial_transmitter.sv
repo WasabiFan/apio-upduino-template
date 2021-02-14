@@ -38,7 +38,7 @@ module serial_transmitter(
             data_shift_buffer <= { 1'b1, tx_data, 1'b0 };
             data_shift_buffer_remaining <= 10;
             ticks_since_last_shift <= 0;
-        end else if (ticks_since_last_shift == cycles_per_bit) begin
+        end else if (ticks_since_last_shift == cycles_per_bit - 1) begin
             ticks_since_last_shift <= 0;
 
             if (data_shift_buffer_remaining > 0) begin

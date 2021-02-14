@@ -37,13 +37,13 @@ module serial_transmitter_tb();
         @(posedge clock);
 
         @(posedge clock); tx_data_available <= 1'b0; tx_data = 8'hAB;
-        repeat(4997) @(posedge clock);
+        repeat(5000) @(posedge clock);
         @(posedge clock); tx_data_available <= 1'b1;
         @(posedge clock); tx_data_available <= 1'b0;
         repeat(5000*10-1) @(posedge clock);
-        @(posedge clock); tx_data_available <= 1'b1; tx_data = 8'h00;
+        @(posedge clock); tx_data_available <= 1'b1; tx_data = 8'h11;
         @(posedge clock); tx_data_available <= 1'b0;
-        repeat(5000*10) @(posedge clock);
+        repeat(5000*10-1) @(posedge clock);
 
         $finish;
     end
