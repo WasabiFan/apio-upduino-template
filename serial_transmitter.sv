@@ -23,9 +23,9 @@ module serial_transmitter(
     assign tx_ready = data_shift_buffer_remaining == 4'b0;
     assign serial_tx = data_shift_buffer[0];
 
-    logic [12:0] clock_divider;
+    logic [12:0] ticks_since_last_shift;
     always_ff @(posedge clock) begin
-        clock_divider <= (clock_divider == (cycles_per_bit-1)) ? 0 : clock_divider + 1;
+        ticks_since_last_shift <= ticks_since_last_shift + 1;
 
         data_shift_buffer <= data_shift_buffer;
         data_shift_buffer_remaining <= data_shift_buffer_remaining;
@@ -33,11 +33,14 @@ module serial_transmitter(
         if (reset) begin
             data_shift_buffer <= {10{ 1'b1 }};
             data_shift_buffer_remaining <= 0;
-            clock_divider <= 0;
+            ticks_since_last_shift <= 0;
         end else if (tx_data_available && tx_ready) begin
             data_shift_buffer <= { 1'b1, tx_data, 1'b0 };
             data_shift_buffer_remaining <= 10;
-        end else if (clock_divider == 0) begin
+            ticks_since_last_shift <= 0;
+        end else if (ticks_since_last_shift == cycles_per_bit) begin
+            ticks_since_last_shift <= 0;
+
             if (data_shift_buffer_remaining > 0) begin
                 data_shift_buffer <= { 1'b1, data_shift_buffer[9:1] };
                 data_shift_buffer_remaining <= data_shift_buffer_remaining - 1;
