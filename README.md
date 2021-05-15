@@ -22,10 +22,10 @@ The following steps are specific to Ubuntu. Similar steps will work for other Li
 First, install Python, apio, dependencies and necessary tools:
 
 ```bash
-# Python and pip
-sudo apt install -y python3-pip git
+# Python, pip, git and unzip
+sudo apt install -y python3-pip git unzip
 
-# gtkwave
+# gtkwave and screen
 sudo apt install -y gtkwave screen
 
 # apio
@@ -45,6 +45,7 @@ Install sv2v (the below will put it in `~/.bin/`, but feel free to choose a diff
 mkdir ~/.bin/ && cd ~/.bin/
 wget https://github.com/zachjs/sv2v/releases/download/v0.0.6/sv2v-Linux.zip
 unzip sv2v-Linux.zip
+cd -
 
 echo 'export PATH="$PATH:${HOME}/.bin/sv2v-Linux"' >> ~/.bashrc
 ```
@@ -102,13 +103,14 @@ Files of interest in this repo:
 
 **Workflow:**
 - The Makefile transpiles your SystemVerilog code into plain Verilog. Everything but the testbenches is automatically combined into a file called `all.v`. This file should be ignored and will be automatically re-generated; don't edit it.
+  - There is an equivalent `all_sim.v` which is the same as `all.v` but was configured to target the simulation environment.
 - Testbenches are each transpiled into their own file, of the same name as the original, but with the `.v` extension. The same as above applies.
 - Errors from most tasks will be attributed to `all.v` rather than your source `.sv` files. When you get an error, check the relevant line in `all.v`; it should be clear where it corresponds to in the original SystemVerilog.
 - Testbenches aren't validated by `make lint`, `make verify` or `make build`. You'll have to watch for error output or misbehavior in your testbenches while simulating.
 
 **Testing in hardware:**
 - The "reset" signal is, as configured in the provided code, GPIO pin 2. "resetting" means connecting pin 2 to GND temporarily.
-- If your current code uses the serial line, it may cause intermittent errors while uploading to the board (`make upload`). If it fails or freezes, cancel and re-try. It'll work after a few times.
+- If your current code uses the serial line, it may cause intermittent errors while uploading to the board (`make upload`). If it fails or freezes, cancel and re-try. It'll work after a few tries.
 - After uploading code, if you want the serial output to work (e.g. via the `screen` command) you will need to unplug and re-plug the board via USB (and remember to reset it!).
 
 ## `make` targets
@@ -116,12 +118,16 @@ Files of interest in this repo:
 - `make verify`: run your code through Icarus Verilog compiler.
 - `make lint`: lint your code with `verilator`.
 - `make build`: synthesize your code for the UPduino.
+- `make build-verbose`: same as `build`, but performs a clean re-build with verbose logging enabled.
 - `make sim-MODNAME`: simulate the testbench called `MODNAME_tb.sv` and open the results in `gtkwave`.
 - `make upload`: synthesize and upload to a real board.
+- `make clean`: delete generated artifacts.
 
 ## Testbenches
 
 Testbenches are authored in files ending with `_tb.sv`. I recommend you name them with the same prefix as the module you're testing. For example, the testbench for `serial_transmitter.sv` is named `serial_transmitter_tb.sv` and can be run with `make sim-serial_transmitter`.
+
+When targeting simulation, a `SIMULATION` preprocessor macro is defined. This can be used for conditionally including simulation-only debugging code, via `ifdef`.
 
 When creating a new testbench, it is probably easiest to copy the given one for `serial_transmitter`. Note that every testbench should have a block like the following at the top of the module, with names changed appropriately:
 

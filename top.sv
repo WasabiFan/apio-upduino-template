@@ -18,8 +18,12 @@ module top (
     logic  int_osc;
 
     // Internal oscillator
+    // CLKHF_DIV: 0b00 -> 48MHz, 0b01 -> 24MHz, 0b10 -> 12MHz, 0b11 -> 6MHz
+    // If changing the divider, also update PNR_BASE_FREQUENCY in the Makefile and the serial
+    // transmitter's cycles_per_bit if in use.
+
     /* verilator lint_off PINMISSING */
-    SB_HFOSC u_SB_HFOSC (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(int_osc));
+    SB_HFOSC #(.CLKHF_DIV("0b00")) u_SB_HFOSC (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(int_osc));
     /* verilator lint_on PINMISSING */
 
     // Serial transmitter
